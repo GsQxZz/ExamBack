@@ -1,0 +1,185 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <link href="~/H-ui.admin/static/h-ui/css/H-ui.min.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/css/H-ui.admin.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/lib/Hui-iconfont/1.0.8/iconfont.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/skin/default/skin.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/css/style.css" rel="stylesheet" />
+    <title>Generate</title>
+
+    <!--_footer 作为公共模版分离出去-->
+    <script src="~/H-ui.admin/lib/jquery/1.9.1/jquery.min.js"></script>
+    <script src="~/H-ui.admin/lib/layer/2.4/layer.js"></script>
+    <script src="~/H-ui.admin/static/h-ui/js/H-ui.min.js"></script>
+    <script src="~/H-ui.admin/static/h-ui.admin/js/H-ui.admin.js"></script>
+    <script src="../Helper/apiUrl.js"></script> <!--/_footer 作为公共模版分离出去-->
+    <!--请在下方写此页面业务相关的脚本-->
+    <script src="~/H-ui.admin/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+    <script src="~/H-ui.admin/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+    <script src="~/H-ui.admin/lib/laypage/1.2/laypage.js"></script>
+    <link href="~/H-ui.admin/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" />
+    <script src="~/H-ui.admin/lib/zTree/v3/js/jquery.ztree.core-3.5.js"></script>
+    <script src="~/H-ui.admin/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+    @*<script src="~/H-ui.admin/lib/zTree/v3/js/jquery.ztree.excheck-3.5.min.js"></script>*@
+    <script type="text/javascript">
+        var UnitId;//定义外键Id
+        //文本就绪函数,当页面加载完毕,树即绑定完毕
+        $(function () {
+            var setting = {
+                data: {
+                    simpleData:
+                    {
+                        enable: true,
+                        idKey: "id",
+                        pIdKey: "pid",
+                        rootPId: null
+                    },
+                    key: {
+                        checked: "isChecked"
+                    }
+                },
+                callback:
+                {
+                    beforeClick: zTreeBeforeClick,
+                    onClick: zTreeOnClick,
+                    beforeCheck: true,
+                    onCheck: onCheck
+                },
+                check: {
+                    autoCheckTrigger: false,
+                    chkboxType: { "Y": "", "N": "" },
+                    chkStyle: "checkbox",
+                    enable: true,
+                    nocheckInherit: false,
+                    chkDisabledInherit: false
+                }
+            };
+            $.ajax({
+                url: "/GenerateTree/GetTreeList",
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $.fn.zTree.init($("#zTreeDemo"), setting, data);
+                    fillter($.fn.zTree.init($("#zTreeDemo"), setting, data));
+                }
+            })
+        })
+
+        //默认展开树的前三级
+        function fillter(treeObj) {
+            //获得树形图对象
+            var nodeList = treeObj.getNodes();
+            //展开第一个根节点
+            for (var i = 0; i < nodeList.length; i++) {
+                //设置节点展开第二级节点
+                treeObj.expandNode(nodeList[i], true, false, true);
+                var nodespan = nodeList[i].children;
+                if (nodespan.length > 0) {
+                    for (var j = 0; j < nodespan.length; j++) {
+                        //设置节点展开第三级节点
+                        treeObj.expandNode(nodespan[j], true, false, true);
+                    }
+                }
+            }
+        }
+
+        //树节点点击之前事件,返回true则代表点击事件可用
+        function zTreeBeforeClick(treeId, treeNode, clickFlag) {
+            var id = treeNode.id;
+            $("#StageIdHidden").val(id);
+            var retu = "";
+            if (treeNode.parentTId == null) {
+                retu = false;
+            }
+            else {
+                retu = true;
+            }
+            return retu;
+        };
+        //点击树节点之后,根据得到的id返回对应的节点
+        function zTreeOnClick(event, treeId, treeNode) {
+            var treeObj = $.fn.zTree.getZTreeObj("zTreeDemo");
+            var sNodes = treeObj.getSelectedNodes();
+            if (sNodes.length > 0) {
+                var tId = sNodes[0].tId;
+            }
+        };
+        //获取选中的复选框
+        function onCheck(e, treeId, treeNode) {
+            var treeObj = $.fn.zTree.getZTreeObj("zTreeDemo"),
+                nodes = treeObj.getCheckedNodes(true),
+                v = "";
+            for (var i = 0; i < nodes.length; i++) {
+                v += nodes[i].id + ",";
+            }
+            UnitId = v;
+        }
+        //点击生成试题
+        function GenerateTest() {
+
+            var id = UnitId.substring(UnitId.length - 1, 0);
+            var qq = id.split(',');
+            var ExamType = "";
+            if (qq.length > 1 && qq.length < 20) {
+                ExamType = "周考";
+            }
+            if (qq.length == 1) {
+                ExamType = "日考";
+            }
+            if (qq.length == 20) {
+                ExamType = "月考";
+            }
+            
+            var treeObj = $.fn.zTree.getZTreeObj("zTreeDemo");
+            var nodes = treeObj.getCheckedNodes(true);
+            var exanName = $("#ExamName").val();
+            if (exanName == "") {
+                alert("请输入试卷名称！");
+                return;
+            }
+            sessionStorage.setItem("OLExamName", exanName);
+            $.ajax({
+                url: '/GenerateTree/backquestionDay',
+                data: { id: id, ExamType: ExamType, sessionStorage: exanName },
+                type: 'get',
+                dataType: 'json',
+                success: function (res) {
+                    if (res> 0) {
+                        alert("生成成功！");
+                    }
+                    if (res < 0) {
+                        alert("试题数量不足40道，请重新生成！");
+                    }
+                }
+            })
+        }
+        
+    </script>
+</head>
+<body>
+    <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 学院管理 <span class="c-gray en">&gt;</span> 阶段管理 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新"><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+    <table class="table">
+        <tr>
+            <td width="200" class="va-t">
+                <ul id="zTreeDemo" class="ztree" style="font-size:20px;color:white;"></ul>
+            </td>
+            <td class="va-t" style="margin-top:0px;" align="center">
+                <p align="center">请输入试题名称：<input type="text" id="ExamName" name="name" value="" /></p>
+                <input type="button" onclick="GenerateTest()" style="width:100%;height:500px; font-size:60px;" name="name" value="单击生成试题"  />
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

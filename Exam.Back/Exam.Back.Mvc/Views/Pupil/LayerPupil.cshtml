@@ -1,0 +1,109 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/bootstrap-3.3.7/css/bootstrap.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <script src="~/H-ui.admin/static/h-ui.admin/js/H-ui.admin.js"></script>
+    <title>LayerPupil</title>
+</head>
+<body>
+    <div>
+        <div style="width:900px;height:500px;background-color:antiquewhite">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <td>姓名</td>
+                        <td>学号</td>
+                        <td>密码</td>
+                    </tr>
+                </thead>
+                <tbody id="body"></tbody>
+            </table>
+            <div id="PagesDiv"></div>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    $(function () {
+
+        GetPupil(1,3);
+    })
+
+    //得到学生
+    function GetPupil(PageIndex,PageSize) {
+        var GradeId = sessionStorage.getItem("GradeId");
+        $.ajax({
+            url: "/Pupil/GetPupilList",
+            type: "get",
+            dataType: "json",
+            data: { GradeId: GradeId, PageIndex: PageIndex, PageSize: PageSize },
+            success: function (data) {
+                $("#body").empty();
+                $(data.Data).each(function () {
+                    $("#body").append(
+                        "<tr>" +
+                        "<td>" + this.StudentName + "</td>" +
+                        "<td>" + this.StudentNumber + "</td>" +
+                        "<td>" + this.StudentPassWord + "</td>" +
+                        "</tr>"
+                    );
+                })
+                Paging(PageIndex, PageSize, data.Count);
+            }
+        })
+    }
+
+    //分页
+    function Paging(PageIndex, PageSize, Count) {
+        //$("#'" + Name + "'").empty();
+        $("#PagesDiv").empty();
+        var CurrentPage = Math.ceil(Count / PageSize);
+        $("#zhui").append("&nbsp共有:<label>" + CurrentPage + "</label>页");
+        var str = "";
+        if (PageSize == Count && PageIndex == 1 || PageSize > Count) {
+            str += "<label>首页</label>" + "&nbsp";
+            str += "<label>上一页</label>" + "&nbsp";
+            str += "<label>下一页</label>" + "&nbsp";
+            str += "<label>最后一页</label>" + "&nbsp";
+            str += "<label>当前第" + PageIndex + "页</label>";
+        }
+        else if (PageIndex == 1 && Count > PageSize) {
+            str += "<label>首页</label>" + "&nbsp";
+            str += "<label>上一页</label>" + "&nbsp";
+            str += "<a href='#' style='color:blue' onclick='GetPupil(" + (PageIndex + 1) + "," + PageSize + ")'>下一页</a>" + "&nbsp";
+            str += "<a href='#' style='color:blue' onclick='GetPupil(" + CurrentPage + "," + PageSize + ")'>最后一页</a>" + "&nbsp";
+            str += "<label>当前第" + PageIndex + "页</label>";
+        }
+        else if (PageIndex > 1 && PageIndex < CurrentPage) {
+            str += "<a href='#' style='color:blue' onclick='GetPupil(" + 1 + "," + PageSize + ")'>首页</a>" + "&nbsp";
+            str += "<a href='#' style='color:blue' onclick='GetPupil(" + (PageIndex - 1) + "," + PageSize + ")'>上一页</a>" + "&nbsp";
+            str += "<a href='#' style='color:blue' onclick='GetPupil(" + (PageIndex + 1) + "," + PageSize + ")'>下一页</a>" + "&nbsp";
+            str += "<a href='#' style='color:blue' onclick='GetPupil(" + CurrentPage + "," + PageSize + ")'>最后一页</a>" + "&nbsp";
+            str += "<label>当前第" + PageIndex + "页</label>";
+        }
+        else {
+            str += "<a href='#' style='color:blue' onclick='GetPupil(" + 1 + "," + PageSize + ")'>首页</a>" + "&nbsp";
+            str += "<a href='#' style='color:blue' onclick='GetPupil(" + (PageIndex - 1) + "," + PageSize + ")'>上一页</a>" + "&nbsp";
+            str += "<label>下一页</label>" + "&nbsp";
+            str += "<label>最后一页</label>" + "&nbsp";
+            str += "<label>当前第" + PageIndex + "页</label>";
+        }
+        //$("#'" + Name + "'").append(str);
+        $("#PagesDiv").append(str);
+    }
+
+    //页面跳转
+    //function GoToPupil() {
+    // location.href = "/Pupil/Pupil";
+        
+    //}
+</script>
+

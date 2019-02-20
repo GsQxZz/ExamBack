@@ -1,0 +1,39 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Show</title>
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <script src="~/Scripts/Journal/Journal.js"></script>
+   
+</head>
+<body>
+    <div> 
+
+        <table style="text-align:center;width:100%;border:none;" border="0">
+            <thead>
+                <tr>
+                    <td colspan="4">
+                        <input id="name" placeholder="请输入用户名" type="text" style="border-radius:5px 5px;width:150px;height:20px;border:1px solid black;" />
+                        <input id="Button1" type="button" style="background-color:#dd514c;border:none;border-radius:5px 5px;height:25px;color:white;width:60px;" value="搜索" onclick="Load(1,10)" />
+                    </td>
+                </tr>
+                <tr style="background-color:#b3e2ea;font-weight:bold;">
+                    <td>用户名</td>
+                    <td>执行操作</td>
+                    <td>操作结果</td>
+                    <td>操作时间</td>
+                </tr>
+            </thead>
+            <tbody id="tb"></tbody>
+        </table>
+        <p id="page" style="text-align:center;color:#ff6a00;"></p>
+    </div>
+</body>
+</html>

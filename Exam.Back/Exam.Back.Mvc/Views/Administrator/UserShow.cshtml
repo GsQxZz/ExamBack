@@ -1,0 +1,172 @@
+﻿
+@{
+    Layout = null;
+}
+@using Exam.Back.Model
+@model IEnumerable<Exam.Back.Model.User>
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="lib/html5shiv.js"></script>
+    <script type="text/javascript" src="lib/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" href="~/H-ui.admin/static/h-ui/css/H-ui.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/H-ui.admin/static/h-ui.admin/css/H-ui.admin.css" />
+    <link rel="stylesheet" type="text/css" href="~/H-ui.admin/lib/Hui-iconfont/1.0.8/iconfont.css" />
+    <link rel="stylesheet" type="text/css" href="~/H-ui.admin/static/h-ui.admin/skin/default/skin.css" id="skin" />
+    <link rel="stylesheet" type="text/css" href="~/H-ui.admin/static/h-ui.admin/css/style.css" />
+    <!--[if IE 6]>
+    <script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+    <script>DD_belatedPNG.fix('*');</script>
+    <![endif]-->
+    <title>用户管理</title>
+</head>
+<body>
+    <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户中心 <span class="c-gray en">&gt;</span> 用户管理 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新"><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+    <div class="pd-20">
+        <div class="text-c">
+            @*日期范围：
+        <input type="text" onfocus="WdatePicker({maxDate:'#F{$dp.$D(\'datemax\')||\'%y-%M-%d\'}'})" id="datemin" class="input-text Wdate" style="width:120px;">
+        -
+        <input type="text" onfocus="WdatePicker({minDate:'#F{$dp.$D(\'datemin\')}',maxDate:'%y-%M-%d'})" id="datemax" class="input-text Wdate" style="width:120px;">*@
+            <form class="Huiform" method="post" action="/Administrator/UserShow" target="_self">
+                <input type="text" class="input-text" style="width:250px" placeholder="输入会员名称" id="name" name="name">
+                <button type="submit" class="btn btn-success" id="" name=""><i class="icon-search"></i> 搜用户</button>
+            </form>
+        </div>
+        <div class="cl pd-5 bg-1 bk-gray mt-20">
+            <span class="l">
+                <a href="javascript:;" onclick="shanchu()" class="btn btn-danger radius"><i class="icon-trash"></i> 批量删除</a>
+                <a href="javascript:;" onclick="user_add('添加用户','user-add.html','500')" class="btn btn-primary radius"><i class="icon-plus"></i> 添加用户</a>
+            </span>
+            <span class="r">共有数据：<strong>@Model.Count()</strong> 条</span>
+        </div>
+        <table class="table table-border table-bordered table-hover table-bg table-sort">
+            <thead>
+                <tr class="text-c">
+                    <th width="25"><input type="checkbox" name="check1" value="check1"></th>
+                    <th width="80">ID</th>
+                    <th width="100">用户名</th>
+                    <th width="40">密码</th>
+                    <th width="40">性别</th>
+                    <th width="90">手机</th>
+                    <th width="130">加入时间</th>
+                    <th width="100">拥有角色</th>
+                    <th width="80">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                <tr class="text-c">
+                    <td><input type="checkbox" value="@item.ID" name="check1"></td>
+                    <td>@item.ID</td>
+                    <td>@item.AccountName</td>
+                    <td>@item.Pwd</td>
+                    <td>
+                        @{
+                            if (Convert.ToInt32(item.Sex)==1)
+                            {
+                                <span>男</span>
+                            }
+                            else
+                            {
+                                <span>女</span>
+                            }
+                                        }
+                                    </td>
+                    <td>@item.Phone</td>
+                    <td>@item.CreTime</td>
+                    <td>@item.OwnRole</td>
+                    <td>
+                       <a title="编辑" href="javascript:;" onclick="admin_user_edit('用户编辑','/Administrator/EditUser?id=@item.ID','310')" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a>
+                       <a title="删除" href="javascript:;" onclick="admin_user_del(this,'@item.ID')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        <div id="pageNav" class="pageNav"></div>
+    </div>
+    <!--_footer 作为公共模版分离出去-->
+    <script type="text/javascript" src="~/H-ui.admin/lib/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="~/H-ui.admin/lib/layer/2.4/layer.js"></script>
+    <script type="text/javascript" src="~/H-ui.admin/static/h-ui/js/H-ui.min.js"></script>
+    <script type="text/javascript" src="~/H-ui.admin/static/h-ui.admin/js/H-ui.admin.js"></script>
+    <!--/_footer 作为公共模版分离出去-->
+    <!--请在下方写此页面业务相关的脚本-->
+    <script type="text/javascript" src="~/H-ui.admin/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+    <script type="text/javascript" src="~/H-ui.admin/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="~/H-ui.admin/lib/laypage/1.2/laypage.js"></script>
+    <script type="text/javascript">
+
+        /*管理员-角色-添加*/
+        function user_add(title, url, w, h)
+        {
+           layer_show("添加用户", "/Administrator/UserAdd", w, h);
+        }
+
+        /*管理员-权限-编辑*/
+        function admin_user_edit(title, url, id, w, h) {
+            layer_show(title, url, w, h);
+        }
+
+            /*管理员-权限-删除*/
+        function admin_user_del(obj, id)
+        {
+                layer.confirm('确认要删除吗？', function (index) {
+                    $.ajax({
+                        type: 'get',
+                        url: '/Administrator/UserDelete?id='+ id,
+                        dataType: 'json',
+                        success: function (data) {
+                            $(obj).parents("tr").remove();
+                            layer.msg('已删除!', { icon: 1, time: 2000 });
+                            setTimeout(function () {
+                                location.href = "/Administrator/UserShow"
+                            }, 1000)
+
+                        },
+                        error: function (data) {
+                            console.log(data.msg);
+                        },
+                    });
+                });
+        }
+
+        function shanchu() {
+            var str = ""
+            $("input[name='check1']:checked").each(function () {
+                str += $(this).val() + ',';
+            })
+
+            var id = str.substring(0, str.length - 1)
+
+            layer.confirm('确认要删除吗？', function (index) {
+                $.ajax({
+                    type: 'post',
+                    url: '/Administrator/UsersDel?id=' + id,
+                    dataType: 'json',
+                    success: function (data) {
+                        layer.msg('已删除!', { icon: 1, time: 2000 });
+                        setTimeout(function () {
+                            location.href = "/Administrator/UserShow"
+                        }, 1000)
+
+                    },
+                    error: function (data) {
+                        console.log(data.msg);
+                    },
+                });
+            });
+        }
+    </script>
+</body>
+</html>
+

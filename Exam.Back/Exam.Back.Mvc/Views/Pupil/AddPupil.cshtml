@@ -1,0 +1,70 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <script src="~/H-ui.admin/lib/layer/2.4/layer.js"></script>
+    <script src="~/H-ui.admin/static/h-ui.admin/js/H-ui.admin.js"></script>
+    <title>AddPupil</title>
+</head>
+<body>
+    <div> 
+        <table>
+            <tr>
+                <td>姓名:</td>
+                <td><input type="text" id="txtPupilName" /></td>
+            </tr>
+            <tr>
+                <td>密码:</td>
+                <td><input type="text" id="txtPupilPwd" /></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="button" value="添加" id="btn" onclick="AddPupils()"/></td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
+<script>
+    //添加学生
+    function AddPupils() {
+        if ($("#txtPupilName").val == "") {
+            alert("请输入学生名称");
+            return;
+        }
+        if ($("#txtPupilPwd").val() == "") {
+            alert("请输入用户密码");
+            return;
+        }
+        var ClassId = sessionStorage.getItem("ClassId");
+        var date = new Date();
+        var number=date.getFullYear().toString() + (date.getMonth()+1).toString() + date.getDate().toString() + date.getHours().toString() + date.getMinutes().toString();
+        var data = {
+            StudentName: $("#txtPupilName").val(),
+            StudentNumber: number,
+            StudentPassWord: $("#txtPupilPwd").val(),
+            ClassId: ClassId
+        };
+        $.ajax({
+            url: "/Pupil/AddPupilNoView",
+            type: "post",
+            dataType: "json",
+            data: data,
+            success: function (data) {
+                if (data > 0) {
+                    layer.msg("添加成功", { icon: 1, Time: 1000 });
+                    setTimeout(function () { layer_close() }, 1000);        
+                }
+                else {
+                    layer.msg("添加失败", { icon: 2, Time: 1000 });
+                }
+            }
+        })
+    }
+</script>

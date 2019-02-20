@@ -1,0 +1,196 @@
+﻿@using Exam.Back.Model
+@{
+    Layout = null;
+}
+@model List<Resultsstatistical>
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ResultIndex</title>
+
+    @*<script src="~/Scripts/jquery-1.10.2-vsdoc.js"></script>*@
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+
+    <link href="~/H-ui.admin/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" />
+    <script src="~/H-ui.admin/lib/zTree/v3/js/jquery.ztree.core-3.5.js"></script>
+    <script src="~/H-ui.admin/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+
+    <link href="~/H-ui.admin/static/h-ui/css/H-ui.min.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/css/H-ui.admin.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/lib/Hui-iconfont/1.0.8/iconfont.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/skin/default/skin.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/css/style.css" rel="stylesheet" />
+    <script src="~/H-ui.admin/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+
+    <script src="~/Scripts/echarts.js"></script>
+    <script>
+        var ClassId = 0;
+
+        $(function () {
+            menu();
+        })
+        function menu() {
+            var setting = {
+                data: {
+                    simpleData:
+                    {
+                        enable: true,
+                        idKey: "id",
+                        pIdKey: "pid",
+                        rootPId: ''
+                    }
+                },
+                callback:
+                {
+                    beforeClick: zTreeBeforeClick,
+                    onClick: zTreeOnClick
+                },
+            };
+            $.ajax({
+                url: "/Test/ShowList",
+                type: "get",
+                dataType: "json",
+                success: function (obj) {
+
+                    $.fn.zTree.init($("#treeDemo"), setting, obj);
+                    fillter($.fn.zTree.init($("#treeDemo"), setting, obj));
+
+                }
+            })
+        }
+        function showContextMenu(type, leaf, x, y) {
+            if (type == -1) {
+                $(".dropdown-menu").find("li:not(:first)").hide();
+            } else if (leaf) {
+                $(".dropdown-menu").find("li:first").hide();
+            } else {
+                $(".dropdown-menu").find("li").show();
+            }
+
+            $("#treeContextMenu").css({ "top": y + "px", "left": x + "px" }).show();
+            $("body").on("mousedown", onBodyMouseDown);
+        }
+        function zTreeBeforeClick(treeId, treeNode, clickFlag) {
+            return true;
+        }
+        //树的点击事件
+        function zTreeOnClick(event, treeId, treeNode) {
+            var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+            var sNodes = treeObj.getSelectedNodes();
+            if (sNodes.length > 0) {
+                var level = sNodes[0].level;
+            }
+            var id = treeNode.id;
+            ClassId = id;
+            if (level == 3) {
+                $("#main").show();
+                Load();
+            }
+            else {
+                $("#main").hide()
+            }
+            
+            
+            //showdata(ClassId);
+        }
+        ///数据处理
+        function resuId(Id) {
+            var ClassId = id.getNodes();
+
+        }
+        //默认展开树的前四级
+        function fillter(treeObj) {
+            //获得树形图对象
+            var nodeList = treeObj.getNodes();
+            //展开第一个根节点
+            for (var i = 0; i < nodeList.length; i++) {
+                //设置节点展开第二级节点
+                treeObj.expandNode(nodeList[i], true, false, true);
+                var nodespan = nodeList[i].children;
+                if (nodespan.length > 0) {
+                    for (var j = 0; j < nodespan.length; j++) {
+                        //设置节点展开第三级节点
+                        treeObj.expandNode(nodespan[j], true, false, true);
+                        //var nodes = nodespan[j].children;
+                        //if (nodes.length > 0) {
+                        //    //展开第四级节点
+                        //    for (var g = 0; g < nodes.length; g++) {
+                        //        treeObj.expandNode(nodes[g], true, false, true);
+                        //    }
+                        //}
+                    }
+                }
+            }
+        }
+
+        function Load() {
+            var student = new Array();
+            var score = new Array();
+            $.ajax({
+                url: "/Test/TestList",
+                type: "get",
+                dataType: "json",
+                data: { ClassId: ClassId, time: $("#user-time").val() },
+                success: function (obj) {
+                    if (obj.length > 0) {
+                        for (var i = 0; i < obj.length; i++) {
+                            student[i] = obj[i].ResultsName;
+                            score[i] = obj[i].ResultsScore;
+                        }
+                    }
+                    var option = {
+                        title: {
+                            text: '学生成绩统计'
+                        },
+                        xAxis: {
+                            name: "姓名(" + student.length+"人)",
+                            type: 'category',
+                            data: student
+                        },
+                        yAxis: {
+                            name: "分数",
+                            type: 'value'
+                        },
+                        series: [{
+                            data: score,
+                            type: 'line',
+                            itemStyle: {
+                                normal: { label: { show: true } }
+                            }
+
+                        }]
+
+                    };
+                    // 使用刚指定的配置项和数据显示图表。
+                    myChart.setOption(option);
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+    <div>
+        <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 成绩统计 <span class="c-gray en">&gt;</span>  <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新"><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+        <div id="menu" style="float:left;width:20%;float:left;">
+            <ul id="treeDemo" class="ztree" style="font-size:20px;color:white;"></ul>
+        </div>
+    </div>
+    <div style="float:right;width:80%" id="right">
+
+        <div style="width:100%;">
+            <input type="text" style="width:200px" class="input-text" value="" placeholder="" id="user-time" name="CreTime" onclick="WdatePicker()">
+            <input id="Button1" type="button" value="查询" onclick="Load()" style="background-color:#5eb95e;border:none;border-radius:5px 5px;height:30px;color:white;width:66px;" />
+        </div>
+        <div id="main" style="width: 800px;height:500px;font-size:20px;">
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+   
+</script>

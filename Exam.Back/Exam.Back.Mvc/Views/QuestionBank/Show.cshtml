@@ -1,0 +1,80 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    /**把HTML和BODY的高度设置成100%**/
+    div #menu {
+        height: 100%;
+        background-color: #e1dfdf;
+    }
+    /**把你DIV的高度设置成100%**/
+</style>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <link href="~/H-ui.admin/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" />
+    <script src="~/H-ui.admin/lib/zTree/v3/js/jquery.ztree.core-3.5.js"></script>
+    <script src="~/H-ui.admin/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+    <script src="~/H-ui.admin/lib/layer/2.4/layer.js"></script>
+    <script src="~/Scripts/QuestionBank.js/Question.js"></script>
+
+    <link href="~/H-ui.admin/static/h-ui/css/H-ui.min.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/css/H-ui.admin.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/lib/Hui-iconfont/1.0.8/iconfont.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/skin/default/skin.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/css/style.css" rel="stylesheet" />
+    <title></title>
+    <script>
+
+    </script>
+</head>
+<body>
+    <div>
+        <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 题库管理 <span class="c-gray en">&gt;</span> 试题管理 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新"><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+        <div id="menu" style="float:left;width:20%;">
+            <ul id="treeDemo" class="ztree" style="font-size:20px;color:white;"></ul>
+        </div>
+        <div id="content" style="float:right;width:80%">
+            <div id="operate" style="width:100%;">
+                <form id="form1" style="display:none;">
+                    <table style="width:100%;text-align:center;font-size:25px;">
+                        <tr>
+                            <td><input style="background-color:#dd514c;border:none;border-radius:5px 5px;height:25px;color:white;width:60px;" type="button" value="批量删除" onclick="delAll()" /></td>
+                            <td>
+
+                                <select id="type">
+                                    <option value="0">---请选择---</option>
+                                    <option value="1">单选题</option>
+                                    <option value="2">多选题</option>
+                                    <option value="3">判断题</option>
+                                </select>
+                            </td>
+                            <td><input type="text" id="qn" placeholder="题目" /></td>
+                            <td><input type="button" style="background-color:#5eb95e;border:none;border-radius:5px 5px;height:25px;color:white;width:50px;" value="搜索" onclick="loadquestion()" /></td>
+                            <td><input type="button" style="background-color:#dd514c;border:none;border-radius:5px 5px;height:25px;color:white;width:60px;" value="添加试题" onclick="addquestion()" /></td>
+                            <td>
+                                <input type="text" id="unitid" hidden />
+                                <input type="button" style="background-color:#dd514c;border:none;border-radius:5px 5px;height:25px;color:white;width:60px;" value="导入试题" onclick="JavaScript: $('input[name=files]').click()" />
+                                <input id="files" type="file" name="files" hidden onchange="imports()" />
+                            </td>
+                            <td><input type="button" style="background-color:#dd514c;border:none;border-radius:5px 5px;height:25px;color:white;width:60px;" value="导出试题" onclick="exports()" /></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+            <div id="question" style="width:100%;">
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

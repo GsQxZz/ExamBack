@@ -1,0 +1,296 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="lib/html5shiv.js"></script>
+    <script type="text/javascript" src="lib/respond.min.js"></script>
+    <![endif]-->
+    <link href="~/H-ui.admin/static/h-ui/css/H-ui.min.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/css/H-ui.admin.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/lib/Hui-iconfont/1.0.8/iconfont.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/skin/default/skin.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/css/style.css" rel="stylesheet" />
+    <!--[if IE 6]>
+    <script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+    <script>DD_belatedPNG.fix('*');</script>
+    <![endif]-->
+    <title>学院显示</title>
+    <link href="~/H-ui.admin/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" />
+</head>
+<body class="pos-r">
+    <div>
+        <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 学院管理 <span class="c-gray en">&gt;</span> 学院显示 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新"><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+        <div class="page-container">
+            <div class="text-c">
+                <input type="text" name="" id="CollegeNameTxt" placeholder="学院名称" style="width:250px" class="input-text">
+                <button name="" id="" class="btn btn-success" type="button" onclick="GetCollege(1,3)"><i class="Hui-iconfont">&#xe665;</i> 查找学院</button>
+            </div>
+            <div class="cl pd-5 bg-1 bk-gray mt-20">
+                <span class="l">
+                    <a href="javascript:;" onclick="DeletePupil('')" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a>
+                    <a class="btn btn-primary radius" onclick="AddCollege()" href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 增加学院</a>
+                </span>
+                <span class="r">共有学院：<strong><label id="StudentNum"></label></strong> 个</span>
+            </div>
+            <div class="mt-20">
+                <table class="table table-border table-bordered table-bg table-hover ">
+                    <thead>
+                        <tr class="text-c">
+                            <th width="40"><input name="" type="checkbox" value=""></th>
+                            <th width="60">学院名称</th>
+                            <th width="100">创建时间</th>
+                            <th width="50">院长</th>
+                            <th width="100">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body"></tbody>
+                </table>
+                <div id="PagesDiv"></div>
+            </div>
+        </div>
+    </div>
+
+    <!--_footer 作为公共模版分离出去-->
+    <script src="~/H-ui.admin/lib/jquery/1.9.1/jquery.min.js"></script>
+    <script src="~/H-ui.admin/lib/layer/2.4/layer.js"></script>
+    <script src="~/H-ui.admin/static/h-ui/js/H-ui.js"></script>
+    <script src="~/H-ui.admin/static/h-ui.admin/js/H-ui.admin.js"></script>
+    <!--请在下方写此页面业务相关的脚本-->
+    <script src="~/H-ui.admin/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+    <script src="~/H-ui.admin/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+    <script src="~/H-ui.admin/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+    <script src="~/H-ui.admin/lib/laypage/1.2/laypage.js"></script>
+    <script>
+        $(function () {
+            GetCollege(1, 3);
+            //GetStage();
+            //ChangeGrade();
+            //GetPupil();
+        })
+
+        //添加学院，首先拼接行
+        function AddCollege() {
+            $("#body").append(
+                "<tr class= 'text-c va-m' id='Add'>" +
+                "<td colspan='2'><input type='text' name=''  id='AddCollegeNameTxt' placeholder='   学院名称' style='width:300px;height:25px;border:1px solid #ccc' class='input - text'></td>" +
+                "<td colspan='2'><input type='text' name=''  id='DeanNameTxt' placeholder='    院长名称' style='width:300px;height:25px;;border:1px solid #ccc' class='input - text'></td>" +
+                "<td class='td-manage'><a class='btn btn - primary radius' onclick='Hide()' href='javascript:; '><i class='Hui - iconfont'>&#xe600;</i> 取消添加</a><a class='btn btn - primary radius' onclick='CollegeC()' href='javascript:; '><i class='Hui - iconfont'>&#xe600;</i> 添加</a></td > " +
+                "</tr>"
+            );
+        }
+
+        //隐藏添加操作
+        function Hide() {
+            $("#Add").remove();
+        }
+
+        //添加学院的js代码
+        function CollegeC() {
+            if ($("#AddCollegeNameTxt").val() == "") {
+                alert("请输入学院名称");
+                return;
+            }
+            if ($("#DeanNameTxt").val() == "") {
+                alert("请输入院长名称");
+                return;
+            }
+            // var ClassId = sessionStorage.getItem("ClassId");
+            var date = new Date();
+            var number = date.toLocaleTimeString();
+            var data = {
+                CollegeName: $("#AddCollegeNameTxt").val(),
+                CreateTime: number,
+                Dean: $("#DeanNameTxt").val(),
+            };
+
+            $.ajax({
+                url: "/College/AddCollege",
+                type: "post",
+                dataType: "json",
+                data: data,
+                success: function (data) {
+                    if (data > 0) {
+                        layer.msg("添加成功", { icon: 1, Time: 1000 });
+                        setTimeout(function () { GetCollege(1, 3) }, 1000);
+                    }
+                    else {
+                        layer.msg("添加失败", { icon: 2, Time: 1000 });
+                    }
+                }
+            })
+        }
+
+        ////绑定阶段下拉
+        //function GetStage() {
+        //    $.ajax({
+        //        url: "/Pupil/GetStageList?CollegeId=0",
+        //        type: "get",
+        //        dataType: "json",
+        //        success: function (data) {
+        //            $("#selStage").empty();
+        //            $("#selStage").append("<option value='0'>请选择阶段</option>");
+        //            $(data).each(function () {
+        //                $("#selStage").append("<option value='" + this.Id + "'>" + this.StageName + "</option>");
+        //            })
+        //        }
+        //    })
+        //}
+        ////跳转到阶段页面
+        //function GoToStage() {
+        //    location.href = "/Stage/GetStage";
+        //}
+
+        ////绑定班级下拉
+        //function ChangeGrade() {
+        //    var StageId = $("#selStage").val();
+        //    $.ajax({
+        //        url: "/Pupil/GetGradeList?StageId=" + StageId,
+        //        type: "get",
+        //        dataType: "json",
+        //        success: function (data) {
+        //            $("#selGrade").empty();
+        //            // if (StageId == 0) {
+        //            $("#selGrade").append("<option value='0'>请选择班级</option>");
+
+        //            // }
+        //            $(data).each(function () {
+        //                $("#selGrade").append("<option value='" + this.Id + "'>" + this.ClassName + "</option>");
+        //            })
+        //        }
+        //    })
+        //}
+
+        //得到所有学院并绑定到table
+        function GetCollege(index, size) {
+            var CollegeName = $("#CollegeNameTxt").val();
+            $.ajax({
+                url: "/College/GetCollegeList",
+                type: "get",
+                dataType: "json",
+                data: { CollegeName: CollegeName, PageIndex: index, PageSize: size },
+                success: function (data) {
+                    $("#body").empty();
+                    $("#StudentNum").html(data.Data.length)
+                    $(data.Data).each(function () {
+                        $("#body").append(
+                            "<tr class= 'text-c va-m'  id='" + this.Id + "'>" +
+                            "<td style='width:80px;'><input name='ck' type='checkbox' value='" + this.Id + "' onclick='sss(" + this.Id + ")'></td>" +
+                            "<td style='width:80px;'>" + this.CollegeName + "</td>" +
+                            "<td style='width:80px;'>" + (this.CreateTime).slice(0, 10) + "</td>" +
+                            "<td style='width:80px;'>" + this.Dean + "</td>" +
+                            "<td style='width:80px;' class='td-manage'><a style='text-decoration:none' class='ml-5' onClick='UpdatePupil(" + this.Id + ")' href='javascript:;' title='编辑'><i class='Hui-iconfont'>&#xe6df;</i></a> <a style='text-decoration:none' class='ml-5' onClick='DeletePupil(" + this.Id + ")' href='javascript:;' title='删除'><i class='Hui-iconfont'>&#xe6e2;</i></a></td>" +
+                            "</tr>"
+                        );
+                    })
+                    Paging(index, size, data.Count);
+                }
+            })
+        }
+
+        ////动态添加数据
+        //function sss(id) {
+        //    $("#" + id + "").after(
+        //        "<tr class= 'text-c va-m'>" +
+        //        "<td colspan='2'><input type='text' name=''  id='CollegeNameTxt' placeholder='   学院名称' style='width: 300px;height:25px;border:1px solid #ccc' class='input - text'></td>" +
+        //        "<td colspan='2'><input type='text' name='' id='DeanNameTxt' placeholder='    院长名称' style='width: 300px;height:25px;;border:1px solid #ccc' class='input - text'></td>" +
+        //        "<td class='td-manage'><a class='btn btn - primary radius' onclick='CollegeC()' href='javascript:; '><i class='Hui - iconfont'>&#xe600;</i> 添加</a></td>" +
+        //        "</tr>"
+        //    );
+        //}
+
+        //分页
+        function Paging(PageIndex, PageSize, Count) {
+            //$("#'" + Name + "'").empty();
+            $("#PagesDiv").empty();
+            var CurrentPage = Math.ceil(Count / PageSize);
+            $("#zhui").append("&nbsp共有:<label>" + CurrentPage + "</label>页");
+            var str = "";
+            if (PageSize == Count && PageIndex == 1 || PageSize > Count) {
+                str += "<label>首页</label>" + "&nbsp";
+                str += "<label>上一页</label>" + "&nbsp";
+                str += "<label>下一页</label>" + "&nbsp";
+                str += "<label>最后一页</label>" + "&nbsp";
+                str += "<label>当前第" + PageIndex + "页</label>";
+            }
+            else if (PageIndex == 1 && Count > PageSize) {
+                str += "<label>首页</label>" + "&nbsp";
+                str += "<label>上一页</label>" + "&nbsp";
+                str += "<a href='#' style='color:blue' onclick='GetCollege(" + (PageIndex + 1) + "," + PageSize + ")'>下一页</a>" + "&nbsp";
+                str += "<a href='#' style='color:blue' onclick='GetCollege(" + CurrentPage + "," + PageSize + ")'>最后一页</a>" + "&nbsp";
+                str += "<label>当前第" + PageIndex + "页</label>";
+            }
+            else if (PageIndex > 1 && PageIndex < CurrentPage) {
+                str += "<a href='#' style='color:blue' onclick='GetCollege(" + 1 + "," + PageSize + ")'>首页</a>" + "&nbsp";
+                str += "<a href='#' style='color:blue' onclick='GetCollege(" + (PageIndex - 1) + "," + PageSize + ")'>上一页</a>" + "&nbsp";
+                str += "<a href='#' style='color:blue' onclick='GetCollege(" + (PageIndex + 1) + "," + PageSize + ")'>下一页</a>" + "&nbsp";
+                str += "<a href='#' style='color:blue' onclick='GetCollege(" + CurrentPage + "," + PageSize + ")'>最后一页</a>" + "&nbsp";
+                str += "<label>当前第" + PageIndex + "页</label>";
+            }
+            else {
+                str += "<a href='#' style='color:blue' onclick='GetCollege(" + 1 + "," + PageSize + ")'>首页</a>" + "&nbsp";
+                str += "<a href='#' style='color:blue' onclick='GetCollege(" + (PageIndex - 1) + "," + PageSize + ")'>上一页</a>" + "&nbsp";
+                str += "<label>下一页</label>" + "&nbsp";
+                str += "<label>最后一页</label>" + "&nbsp";
+                str += "<label>当前第" + PageIndex + "页</label>";
+            }
+            //$("#'" + Name + "'").append(str);
+            $("#PagesDiv").append(str);
+        }
+
+        ////修改跳转模态窗
+        //function UpdatePupil(id) {
+        //    if ($("#selGrade").val() == 0) {
+        //        layer.msg("请选择班级", { icon: 5, Time: 1000 });
+        //        return;
+        //    }
+        //    if ($("#selStage").val() == 0) {
+        //        layer.msg("请选择学院", { icon: 5, Time: 1000 });
+        //        return;
+        //    }
+        //    sessionStorage.setItem("StageId", $("#selStage").val());
+        //    sessionStorage.setItem("StudentId", id);
+        //    layer_show("修改学生信息", "/Pupil/UpdatePupil", 600, 300);
+        //}
+
+        //删除学院
+        function DeletePupil(CollegeId) {
+            if (CollegeId == "") {
+                $("input[name='ck']:checked").each(function (index, element) {
+                    CollegeId+="'"+ $(this).val()+"',";
+                })
+                CollegeId = CollegeId.substring(0, CollegeId.length - 1);
+            }
+            if (CollegeId == "") {
+                alert("至少选择一个学院");
+                return;
+            }
+            if (confirm("销毁学院不可恢复，是否继续?")) {
+                $.ajax({
+                    url: "/College/DeleteCollege?CollegeId=" + CollegeId,
+                    type: "get",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data > 0) {
+                            layer.msg("删除成功", { icon: 1, Time: 1000 });
+                            setTimeout(function () { GetCollege(1, 3); return; }, 1000);
+                        }
+                        else {
+                            layer.msg("删除失败", { icon: 2, Time:1000 });
+                        }
+                    }
+                })
+            }
+        }
+    </script>
+</body>
+</html>
+

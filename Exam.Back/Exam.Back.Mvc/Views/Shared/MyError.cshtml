@@ -1,0 +1,16 @@
+﻿
+@{
+    ViewBag.Title = "MyError";
+}
+
+<h2>MyError</h2>
+<div>
+    <div>
+        @Model.Exception.GetType().Name<br />
+        @Model.Exception.Message<br />
+        @Model.ControllerName<br />
+        @Model.ActionName<br />
+        @Model.Exception.StackTrace<br />
+    </div>
+</div>
+

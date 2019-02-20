@@ -1,0 +1,103 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <script src="~/H-ui.admin/lib/layer/2.4/layer.js"></script>
+    <script src="~/H-ui.admin/static/h-ui.admin/js/H-ui.admin.js"></script>
+    <title>UpdatePupil</title>
+</head>
+<body>
+    <div>
+        <table>
+            <tr>
+                <td>姓名:</td>
+                <td><input type="text" id="txtPupilName" disabled="disabled"/></td>
+            </tr>
+            <tr>
+                <td>密码:</td>
+                <td><input type="text" id="txtPupilPwd" /></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="button" value="修改" id="btn" onclick="UpdatePupils()" /></td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
+<script>
+
+    $(function () {
+        GetPupil();
+        FillSel();
+    })
+
+    //绑定下拉框
+    //function FillSel() {
+    //    var StageId = sessionStorage.getItem("StageId");
+    //    $.ajax({
+    //        url: "/Pupil/GetGradeList?StageId=" + StageId,
+    //        type: "get",
+    //        dataType: "json",
+    //        success: function (data) {
+    //            $("#selGrade").empty();
+    //            $(data).each(function () {
+    //                $("#selGrade").append("<option value='" + this.Id + "'>" + this.ClassName + "</option>");
+    //            })
+
+    //        }
+    //    })
+    //}
+
+    //得到对应学生信息并反填
+    function GetPupil() {
+        var PupilId = sessionStorage.getItem("StudentId");
+        $.ajax({
+            url: "/Pupil/GetPupilById?PupilId=" + PupilId,
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                $(data).each(function () {
+                    $("#txtPupilName").val(this.StudentName);
+                    $("#txtPupilPwd").val(this.StudentPassWord);
+                    //$("#selGrade").val(this.ClassId);
+                })
+
+            }
+        })
+    }
+
+    //获取修改后的数据并保存到数据库里
+    function UpdatePupils() {
+        //var ClassId = sessionStorage.getItem("ClassId");
+        //var date = new Date();
+        //var number=date.getFullYear().toString() + (date.getMonth()+1).toString() + date.getDate().toString() + date.getHours().toString() + date.getMinutes().toString();
+        var data = {
+            Id:PupilId = sessionStorage.getItem("StudentId"),
+            StudentPassWord: $("#txtPupilPwd").val(),
+            //ClassId: $("#selGrade").val()
+        };
+
+        $.ajax({
+            url: "/Pupil/UpdatePupilNoView",
+            type: "post",
+            dataType: "json",
+            data: data,
+            success: function (data) {
+                if (data > 0) {
+                    layer.msg("修改成功", { icon: 1, Time: 1000 });
+                    setInterval(function () { layer_close() }, 1000);
+                }
+                else {
+                    layer.msg("修改失败", { icon: 2, Time: 1000 });
+                }
+            }
+        })
+    }
+</script>

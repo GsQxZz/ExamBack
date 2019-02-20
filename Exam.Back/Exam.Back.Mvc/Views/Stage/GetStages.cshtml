@@ -1,0 +1,420 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="lib/html5shiv.js"></script>
+    <script type="text/javascript" src="lib/respond.min.js"></script>
+    <![endif]-->
+    <link href="~/H-ui.admin/static/h-ui/css/H-ui.min.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/css/H-ui.admin.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/lib/Hui-iconfont/1.0.8/iconfont.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/skin/default/skin.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/static/h-ui.admin/css/style.css" rel="stylesheet" />
+    <link href="~/H-ui.admin/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" />
+    <!--[if IE 6]>
+    <script type="text/javascript" src="lib/DD_belatedPNG_0.0.8a-min.js" ></script>
+    <script>DD_belatedPNG.fix('*');</script>
+    <![endif]-->
+    <title>GetStages</title>
+</head>
+<body>
+    <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 学院管理 <span class="c-gray en">&gt;</span> 阶段管理 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新"><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+    <table class="table">
+        <tr>
+            <td width="200" class="va-t">
+                <p>
+                    <select id="CollegeSel" onchange="ShowZtree()" style="width:230px;height:25px;"></select>
+                    <input type="button" value="添加根阶段" onclick="AddStage()" />
+                    <input type="text" placeholder="请输入要添加的根阶段名称" value="" id="txtStageName" class="input-text" style="display:none">
+                    <span class="btn-upload form-group">
+                        <input type="hidden" id="txthidden" />
+                    </span><button type="button" style="display:none;" class="btn btn-success" id="btn_AddStage" name="" onClick="btnAddStage()"><i class="Hui-iconfont">&#xe600;</i> 确认添加</button>
+                    <input type="text" placeholder="请输入要添加的子阶段名称" value="" id="txtStageNameChilrend" class="input-text" style="display:none">
+                    <span class="btn-upload form-group"> 
+                    </span><button type="button" class="btn btn-success" style="display:none;" id="btn_AddStageChildren" name="" onClick="btnAddStageChildren()"><i class="Hui-iconfont">&#xe600;</i> 确认添加</button>
+                </p>
+                <ul id="zTreeDemo" class="ztree"></ul>
+            </td>
+            <td class="va-t" style="margin-top:0px;">
+                <div class="page-container" style="width:900px;height:600px;">
+                    <input type="hidden" id="StageIdHidden" />
+                    <div class="text-c">
+                        <form class="Huiform" method="post" action="" target="_self">
+
+                            <input type="text" placeholder="请输入要添加的班级名称" value="" id="txtClassName" class="input-text" style="display:none">
+                            <span class="btn-upload form-group">
+                            </span><button type="button" class="btn btn-success" id="btn_AddYes" name="" onClick="addClass()"><i class="Hui-iconfont">&#xe600;</i> 确认添加</button>
+                        </form>
+                    </div>
+                    <div class="cl pd-5 bg-1 bk-gray mt-20"> @*<span class="l"><a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a></span>*@ <span class="l" id="ShowI"><a href="javascript:;" onclick="ShowAdd()" id="ShowA" class="btn btn-success radius"><i class="Hui-iconfont">&#xe600;</i> 添加班级</a></span> <span class="r">共有班级：<strong><label id="collegeNum"></label></strong> 个</span> </div>
+                    <div class="mt-20" id="ceshishuaxindiv">
+                        <table class="table table-border table-bordered table-bg">
+                            <thead>
+                                <tr class="text-c">
+                                    <th width="25"><input type="checkbox" name="" value=""></th>
+                                    <th width="70">班级编号</th>
+                                    <th width="80">班级名称</th>
+                                    <th width="50">具体操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyGrade"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <!--_footer 作为公共模版分离出去-->
+    <script src="~/H-ui.admin/lib/jquery/1.9.1/jquery.min.js"></script>
+    <script src="~/H-ui.admin/lib/layer/2.4/layer.js"></script>
+    <script src="~/H-ui.admin/static/h-ui/js/H-ui.min.js"></script>
+    <script src="~/H-ui.admin/static/h-ui.admin/js/H-ui.admin.js"></script>
+    <script src="../Helper/apiUrl.js"></script> <!--/_footer 作为公共模版分离出去-->
+    <!--请在下方写此页面业务相关的脚本-->
+    <script src="~/H-ui.admin/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+    <script src="~/H-ui.admin/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+    <script src="~/H-ui.admin/lib/laypage/1.2/laypage.js"></script>
+    @*<script src="~/H-ui.admin/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+        <script src="~/H-ui.admin/lib/zTree/v3/js/jquery.ztree.core-3.5.js"></script>*@
+    <script src="~/H-ui.admin/lib/zTree/v3/js/jquery.ztree.all-3.5.js"></script>
+    <script type="text/javascript">
+
+
+        ////跳转到具体显示学生页面
+        //function GoToPupil() {
+        //    // sessionStorage.setItem("GradeId", id);
+        //    location.href = "/Pupil/Pupil";
+        //}
+
+        //文本就绪函数,当页面加载完毕,树即绑定完毕
+        $(function () {
+            GetCollege();
+            $("#btn_AddYes").hide();
+        })
+
+        //zTree显示需要的配置
+        var setting = {
+            data: {   
+                simpleData:
+                {
+                    enable: true,
+                    idKey: "id",
+                    pIdKey: "pId",
+                    rootPId: ''
+                }
+            },
+            check: {
+                enable: true
+            },
+            callback:
+            {
+                beforeClick: zTreeBeforeClick,  //点击之前的回调事件
+                onClick: zTreeOnClick,         //点击之后的回调事件
+                beforeRemove: zTreeBeforeRemove,  //删除前
+                onRemove: zTreeOnRemove          //删除后
+            },
+            edit: {
+                enable: true,
+                showRemoveBtn: true,
+                showRenameBtn: false,
+                removeTitle: "删除节点"
+            },
+            view: {
+                addHoverDom: addHoverDom,      //鼠标移入，显示用户自定义控件
+                removeHoverDom: removeHoverDom   //鼠标移除，隐藏自定义控件
+	       }
+        };
+
+        //鼠标移入，显示用户自定义控件
+        function addHoverDom(treeId, treeNode) {
+            var aObj = $("#" + treeNode.tId + "_a");
+            if ($("#diyBtn_" + treeNode.id).length > 0) return;
+            var editStr = "<button type='button' class='diyBtn1' id='diyBtn_" + treeNode.id+ "' title='" + treeNode.name + "' onfocus='this.blur();'>+</button>";
+            aObj.append(editStr);
+            var btn = $("#diyBtn_" + treeNode.id);
+            if (btn) btn.bind("click", function () {
+                AddStageChildr();
+                $("#txthidden").val(treeNode.id);
+            });
+        };
+
+        //鼠标移除，隐藏自定义控件
+        function removeHoverDom(treeId, treeNode) {
+            $("#diyBtn_" + treeNode.id).unbind().remove();
+        };
+
+        //绑定ztree的函数
+        function ShowZtree() {           
+           var CollegeId= $("#CollegeSel").val();
+            $.ajax({
+                url: "/Stage/GetStageList?CollegeId=" + CollegeId,
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    $.fn.zTree.init($("#zTreeDemo"), setting, data);
+                }
+            })
+        }
+
+        //节点被删除之前事件
+        function zTreeBeforeRemove(treeId, treeNode) {
+            var IsUse = true;
+            if (confirm("节点删除不可恢复，是否继续？")) {
+                return IsUse;
+            }
+            return false;
+        }
+
+        //节点被删除之后的事件
+        function zTreeOnRemove(event, treeId, treeNode) {
+            $.ajax({
+                url: "/Stage/DeleteStage?StageId=" + treeNode.id,
+                dataType: "json",
+                type: "post",
+                success: function (data) {
+                    if (data > 0) {
+                        layer.msg('删除成功', { icon: 1, time: 1000 });
+                        setTimeout(function () { ShowZtree(); }, 1000);
+                    }
+                }
+            })
+        }
+
+        //添加阶段
+        function btnAddStage() {
+            if ($("#txtStageName").val() == "")
+            {
+                alert("请输入阶段名称");
+                return;
+            }
+            $.ajax({
+                url: "/Stage/AddStage",
+                dataType: "json",
+                type: "post",
+                data: { StageName: $("#txtStageName").val(), CollegeId: $("#CollegeSel").val(),PId:0 },
+                success: function (data) {
+                    if (data > 0) {
+                        layer.msg('添加成功', { icon: 1, time: 1000 });
+                        setTimeout(function () { ShowZtree(); AddStage(); }, 1000);
+                    }
+                }
+            })
+        }
+
+        //添加子阶段
+        function btnAddStageChildren() {
+            if ($("#txtStageNameChilrend").val() == "") {
+                alert("请输入阶段名称");
+                return;
+            }
+            $.ajax({
+                url: "/Stage/AddStage",
+                dataType: "json",
+                type: "post",
+                data: { StageName: $("#txtStageNameChilrend").val(), CollegeId: $("#CollegeSel").val(), PId: $("#txthidden").val() },
+                success: function (data) {
+                    if (data > 0) {
+                        layer.msg('添加成功', { icon: 1, time: 1000 });
+                        setTimeout(function () { ShowZtree(); AddStageChildr(); }, 1000);
+                    }
+                }
+            })
+        }
+
+        //获取所有的学院绑定下拉框
+        function GetCollege() {
+            $.ajax({
+                url: "/College/GetCollegeList",
+                type: "get",
+                dataType: "json",
+                data: { CollegeName: "", PageIndex: 1, PageSize: 1000 },
+                success: function (data) {
+                    $("#CollegeSel").empty();
+                    $(data.Data).each(function () {
+                        $("#CollegeSel").append("<option value='" + this.Id + "'>" + this.CollegeName + "</option>");
+                    })
+                    ShowZtree();
+                }
+            })
+        }
+
+        //模态窗显示学生信息
+        function GoToLayerPupil(id) {
+            sessionStorage.setItem("GradeId", id);
+            layer_show("查看学生信息", "/Pupil/LayerPupil", 900, 600);
+        }
+
+        //树节点点击之前事件,返回true则代表点击事件可用
+        function zTreeBeforeClick(treeId, treeNode, clickFlag) {
+            var id = treeNode.id;
+            $("#StageIdHidden").val(id);
+            var retu = "";
+            if (treeNode.parentTId == null) {
+                retu = false;
+            }
+            else {
+                retu = true;
+            }
+            return retu;
+        };
+
+        //进行了修改,所有的后台以及接口全部撰写完毕,前台暂时需要整理思路,如何配合树节点的点击事件来实现分页
+        //点击树节点之后,根据得到的id返回对应的班级
+        function zTreeOnClick(event, treeId, treeNode) {
+            ShowGradeList();
+        };
+
+        //班级的显示，根据树节点的点击显示对应阶段的所有班级信息
+        function ShowGradeList() {
+            $.ajax({
+                url: "/Stage/GetGradeList",
+                type: "get",
+                dataType: "json",
+                data: { stageId: $("#StageIdHidden").val(), PageIndex: 1, PageSize: 10 },
+                success: function (data) {
+                    $("#bodyGrade").empty();
+                    $("#collegeNum").html(data.Data.length)
+                    $(data.Data).each(function () {
+                        $("#bodyGrade").append(
+                            "<tr class='text-c'>" +
+                            "<td><input name='' type='checkbox' value=''></td>" +
+                            "<td>" + this.Id + "</td>" +
+                            "<td>" + this.ClassName + "</td>" +
+                            "<td class='f-14 product-brand-manage'>" +
+                            "<a style='text-decoration:none' onClick='UpGrade(" + this.Id + ")' href='javascript:;' title='生阶段'><i class='Hui-iconfont'>&#xe6df;</i></a>" +
+                            "<a style='text-decoration:none' onClick='GoToLayerPupil(" + this.Id + ")' href='javascript:;' title='查看'><i class='Hui-iconfont'>&#xe6df;</i></a>" +
+                            "<a style='text-decoration:none' class='ml-5' onClick='DeleteGrade(" + this.Id + ")' href='javascript:;' title='删除'><i class='Hui-iconfont'>&#xe6e2;</i></a>" +
+                            "</td>" +
+                            "</tr>"
+                        );
+                    })
+                }
+            })
+        }
+
+        //生阶段的函数
+        function UpGrade(greadeId) {
+            $.ajax({
+                url: "/Stage/UpGradeOne",
+                type: "post",
+                dataType: "json",
+                data: { gradeId: greadeId },
+                success: function (data) {
+                    if (data > 0) {
+                        layer.msg('生阶段成功', { icon: 1, time: 1000 });
+                        setTimeout(function () { location.reload() }, 1000);
+                        //location.reload();
+                    }
+                }
+            })
+        }
+
+        //添加班级事件
+        function addClass() {
+            if ($("#txtClassName").val() == "") {
+                alert("班级名称不能为空");
+                return;
+            }
+            if ($("#StageIdHidden").val() == "") {
+                alert("请选择阶段");
+                return;
+            }
+            var data = {
+                StageId: $("#StageIdHidden").val(),
+                ClassName: $("#txtClassName").val()
+            };
+            $.ajax({
+                url: "/Stage/AddClass",
+                type: "post",
+                dataType: "json",
+                data: data,
+                success: function (data) {
+                    if (data > 0) {
+                        layer.msg('添加班级成功', { icon: 1, time: 1000 });
+                        setTimeout(function () { ShowGradeList(); }, 1000);
+                    }
+                }
+            })
+        }
+
+        //删除班级
+        function DeleteGrade(id) {
+            if (confirm("删除之后不可恢复,是否继续")) {
+                $.ajax({
+                    url: "/Stage/DeleteClass?Id=" + id,
+                    dataType: "json",
+                    type: "post",
+                    success: function (data) {
+                        if (data > 0) {
+                            layer.msg('删除成功', { icon: 1, time: 1000 });
+                            setTimeout(function () { ShowGradeList(); }, 1000);
+                        }
+                    }
+                })
+            }
+        }
+
+        var StageChilred = {};
+        StageChilred.value = "Show"
+        //点击添加按钮之后，显示添加的文本框和确认添加按钮
+        function AddStageChildr() {
+
+            if (StageChilred.value == "Show") {
+                $("#btn_AddStageChildren").show();
+                $("#txtStageNameChilrend").prop("style", 'width:200px;');
+                StageChilred.value = "Hide"
+            }
+            else {
+                $("#btn_AddStageChildren").hide();
+                $("#txtStageNameChilrend").prop("style", 'display:none');
+                StageChilred.value = "Show"
+            }
+        }
+
+        var Stage = {};
+        Stage.value = "Show"
+        //点击添加按钮之后，显示添加的文本框和确认添加按钮
+        function AddStage() {
+
+            if (Stage.value == "Show") {
+                $("#btn_AddStage").show();
+                $("#txtStageName").prop("style", 'width:200px;');
+                Stage.value = "Hide"
+            }
+            else {
+                $("#btn_AddStage").hide();
+                $("#txtStageName").prop("style", 'display:none');
+                Stage.value = "Show"
+            }
+        }
+
+
+        var Class = {};
+        Class.value = "Show"
+        //点击添加按钮之后，显示添加的文本框和确认添加按钮
+        function ShowAdd() {
+
+            if (Class.value == "Show") {
+                $("#btn_AddYes").show();
+                $("#txtClassName").prop("style", 'width:200px;');
+                Class.value = "Hide"
+            }
+            else {
+                $("#btn_AddYes").hide();
+                $("#txtClassName").prop("style", 'display:none');
+                Class.value = "Show"
+            }
+        }
+    </script>
+</body>
+</html>
